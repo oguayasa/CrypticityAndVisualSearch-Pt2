@@ -124,6 +124,9 @@ dev.off()
 
 **Figure 1** A barplot showing the frequencies of different search types according to crypticity treatment (bar colors). Numbers are not whole because they represent the sums of the count averages taken from each sub-block of four trials.
 
+![](https://github.com/oguayasa/SearchDifficultyValidation-Pt2/blob/master/imgs/SearchCountBarPlot.jpg)
+
+
 Based on the contingency table, while crypticity treatment does not seem to affect the number of FP and TN searches, there definitely seems to be an effect on the number of TP and FN searches (which makes sense, since the number of TP and FN searches are related).
 
 Chi-Square Test of Independence
@@ -157,11 +160,17 @@ Check data distributions prior to analysis
 
 This is so that we know how to properly specify our GLMMs in our code. Here, we will visualize data distributions using histograms and compare them to a normal distribution using qq-plots.
 
-**Figure 2**
+**Figure 2** Number of TP searches and Average Search Duration.
+![](https://github.com/oguayasa/SearchDifficultyValidation-Pt2/blob/master/imgs/genResultsDistCheck.2.jpg)
 
-**Figure 3**
 
-**Figure 4**
+**Figure 3** Number of TN searches and Average Search Duration.
+![](https://github.com/oguayasa/SearchDifficultyValidation-Pt2/blob/master/imgs/genResultsDistCheck.3.jpg)
+
+
+**Figure 4** Average Pupil Size and Total Search Duration.
+![](https://github.com/oguayasa/SearchDifficultyValidation-Pt2/blob/master/imgs/genResultsDistCheck.1.jpg)
+
 
 Given the fact that NumTP and NumTN are count data (Figure 2), it is not surprising that they do not follow a normal distribution. To model these two measures, we will apply GLMMs with a Possion family(count data) and a log link function. Our other dependent variables (Figures 3 & 4)are continuous, but many of the distributions are not normal (which is pretty normal for psychological and biological behavioral studies). For these measures, our GLMMs will be specified with a Gaussian family (to deal with continuous data) with an identify link function. Since none of our distributions are "normal", we will but estimate our model parameters using Laplace approximation instead of any Maximum Likelihood approaches.
 
@@ -231,13 +240,16 @@ Boxplots to visualize treatments effects
 
 To visualize treatment effects and subject variation, we will use boxplots overlaid on top of individual lines representing subject averages across treatments. Below each boxplot figure, we will include a histogram showing the distribution of within subject differences across treatments. These figures will include data from all measures, so that we can discuss results from the measures that were not used as examples for the GLMM and ICC analyses.
 
-Show all three
+**Figure 6** Number of TP searches and Average Search Duration.
+![](https://github.com/oguayasa/SearchDifficultyValidation-Pt2/blob/master/imgs/genResultsBarPlots.2.jpg)
 
-**Figure 6**
 
-**Figure 7**
+**Figure 7** Number of TN searches and Average Search Duration.
+![](https://github.com/oguayasa/SearchDifficultyValidation-Pt2/blob/master/imgs/genResultsBarPlots.3.jpg)
 
-**Figure 8**
+
+**Figure 8** Average Pupil Size and Total Search Distance
+![](https://github.com/oguayasa/SearchDifficultyValidation-Pt2/blob/master/imgs/genResultsBarPlots.1.jpg)
 
 Discuss Results
 
@@ -332,11 +344,16 @@ Scatterplots to view relationships
 
 Let's visualize these correlations using scatterplots overlaid with a line of best fit.
 
-**Figure 9**
+**Figure 9** Number of TP searches and Average Search Duration.
+![](https://github.com/oguayasa/SearchDifficultyValidation-Pt2/blob/master/imgs/genResultsCorrPlots.2.jpg)
 
-**Figure 10**
 
-**Figure 11**
+**Figure 10** Number of TN searches and Average Search Duration.
+![](https://github.com/oguayasa/SearchDifficultyValidation-Pt2/blob/master/imgs/genResultsCorrPlots.3.jpg)
+
+
+**Figure 11** Average Pupil Size and Total Search Distance
+![](https://github.com/oguayasa/SearchDifficultyValidation-Pt2/blob/master/imgs/genResultsCorrPlots.1.jpg)
 
 The lack of correlation for the number of true-positive searches (Figure 10), is quite apparent.
 
