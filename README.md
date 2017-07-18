@@ -123,8 +123,7 @@ dev.off()
 ```
 
 **Figure 1** A barplot showing the frequencies of different search types according to crypticity treatment (bar colors). Numbers are not whole because they represent the sums of the count averages taken from each sub-block of four trials.
-
-![](https://github.com/oguayasa/SearchDifficultyValidation-Pt2/blob/master/imgs/SearchCountBarPlot.jpg)
+![](https://github.com/oguayasa/CrypticityAndVisualSearch-Pt2/blob/master/imgs/SearchCountBarPlot.jpg)
 
 
 Based on the contingency table, while crypticity treatment does not seem to affect the number of FP and TN searches, there definitely seems to be an effect on the number of TP and FN searches (which makes sense, since the number of TP and FN searches are related).
