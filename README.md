@@ -1,6 +1,11 @@
-Introduction
-============
+The Effects of Target Crypticity on Search Performance & Behaviors
+=======================================================
 
+Olivia Guayasamin
+7/18/2017
+
+Introduction
+--------
 This code demonstrate initial analyses to determine the effects of target crypticity (difficulty) on search performance and behaviors during a visual search task. We asked subjects to complete several rounds of a repeated visual search task where their goal was to find as many target stimuli, randomly placed withing a large "cloud" of similar looking distractors, as possible within a limited amount of time. The number of targets per trial was always 5, but subjects were told that it varied randomly. Each subject completed two blocks of trials, with one block containing only Easy versions of the task and the other containing only Hard versions. The Easy and Hard versions differed only in the [crypticity of targets](https://github.com/oguayasa/CrypticityAndVisualSearch-Pt1), not in their size, placement, or amount. The order in which these versions were presented was counterbalanced across subjects. Subject gaze positions were recorded throughout the study using Tobii eye-trackers.
 
 To get a more complete understanding of how target crypticity affects search performance and behaviors, we decided to analyze the frequency and properties of all searches, not just the successful ones. To do this, we first classified each search based on its outcome: True Positives **TP** were searches where the target was successfully identified, True Negatives **TN** describe searches where a distractor was correctly left alone, False Positives **FP** were searches where a distractor was incorrectly identifed as a target, and False Negatives **FN** describe searches where a target went unidentified (FP and TN searches were extracted from a subset of 5 randomly selected distractors). After classifying searches into different "types" based on outcome, we determined the number and duration of every search type from each trial. In addition, we also extracted the total search distance (length of scan path) and average pupil size from each trial.
