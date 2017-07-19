@@ -64,6 +64,14 @@ get_legend <- function(myggplot){
 Import and format data files
 ----------------------------
 
+``` r
+val.GenData <- read_excel("val_GenResultsBlockedData.xlsx")
+
+# get rid of excess data columns
+val.Data <- as.data.frame(val.GenData[, c(1, 2, 3, 4, 5, 6, 9, 10,
+                                          11, 12, 17, 18, 19, 20)])
+```
+
 Chi-Square Test of Independence on Search Outcomes
 ==================================================
 
@@ -178,64 +186,98 @@ Given the fact that NumTP and NumTN are count data (Figure 2), it is not surpris
 Run GLMMs and review output
 ---------------------------
 
-To save time and space, only the output from one GLMM will be shown. However, all of the boxplots showing treatment comparisons will be included, and the results from all of the GLMMs will be summarized there. This example will show the GLMM output and subsequent analysis for the average duration of True Positive searches.
+To save time and space, only the output from one GLMM will be shown. However, all of the boxplots showing treatment comparisons will be included, so all general results will eventually be summarized. This example will show the GLMM output and subsequent analysis for the average duration of True-Positive searches.
 
-**Table 3** Estimates of Fixed and Random Effects. There is no std.error or statistic for the random effects because this particular function does not estimate them
+While most counterbalance designs would include an interaction term for the fixed effects (to see if there is an interaction between time and treatment), there is not one included here. Previously, we checked for a significant interaction and found none, so it has been removed from the final model shown below. In addition, while sub-block order has been been defined as a random intercept, subject is included as random intercept (expected to covary with) a random slope. This is because it is unlikely that all subjects showed the same pattern of change across Easy and Hard crypticity treatments, so we want the model to account for the likely variance in that change. 
 
-| term                       |     estimate|  std.error|   statistic| group      |
-|:---------------------------|------------:|----------:|-----------:|:-----------|
-| (Intercept)                |   4223.23265|   200.1265|   21.102811| fixed      |
-| ExpVermost                 |  -1409.32809|    97.9753|  -14.384524| fixed      |
-| TreatmentOrder             |    130.58705|    97.9753|    1.332857| fixed      |
-| sd\_(Intercept).PartID     |    684.86343|         NA|          NA| PartID     |
-| sd\_(Intercept).BlockOrder |     95.07958|         NA|          NA| BlockOrder |
-| sd\_Observation.Residual   |    838.15382|         NA|          NA| Residual   |
+``` r
+# reformat data for applying and plotting glmm
+dat.4Analysis <- as.data.frame(val.Data[, c(1, 2, 3, 4, 5, 6, 7, 10, 11, 12)])
+cur.Data <- as.data.frame(dat.4Analysis[, c(1, 2, 3, 4, 9)])
+cur.Data$TreatmentOrder <- factor(cur.Data$TreatmentOrder)  # convert to factor
+cur.Data$BlockOrder <- factor(cur.Data$BlockOrder)  # convert to factor
+
+# name of measure
+cur.Name <- names(cur.Data[5])
+
+# create model
+cur.Glmm <- glmer(TimePerTP ~ ExpVer + TreatmentOrder + (1|BlockOrder) + (1 + ExpVer|PartID),
+                  data = cur.Data, family = gaussian(link = identity))
+```
+**Table 3** Estimates of Fixed and Random Effects. There is no std.error or statistic for the random effects because this particular function does not estimate them.
+
+| term                               |       estimate|  std.error|  statistic| group      |
+|:-----------------------------------|--------------:|----------:|----------:|:-----------|
+| (Intercept)                        |   4348.5868139|   177.6400|   24.47978| fixed      |
+| ExpVermost                         |  -1413.3563530|   134.5622|  -10.50337| fixed      |
+| TreatmentOrder2                    |    147.7201942|   124.5050|    1.18646| fixed      |
+| sd\_(Intercept).PartID             |    896.7876663|         NA|         NA| PartID     |
+| sd\_ExpVermost.PartID              |    603.0722333|         NA|         NA| PartID     |
+| cor\_(Intercept).ExpVermost.PartID |     -0.7637152|         NA|         NA| PartID     |
+| sd\_(Intercept).BlockOrder         |     99.4459871|         NA|         NA| BlockOrder |
+| sd\_Observation.Residual           |    775.9416965|         NA|         NA| Residual   |
+
+Here, we see the basic estimates of each effect's contribution to the model. Because we only get limited output from this function, it doesn't tell us very much. To actually learn if each effect made a significant contribution, let's estimate some confidence intervals. 
 
 **Table 4** Bootstrapped confidence intervals for the estimates of Fixed and Random Effects
 
-| .rownames                  |       X2.5..|     X97.5..|
-|:---------------------------|------------:|-----------:|
-| sd\_(Intercept)|PartID     |    470.22007|    867.0899|
-| sd\_(Intercept)|BlockOrder |      0.00000|    236.7538|
-| sigma                      |    763.34405|    916.5541|
-| (Intercept)                |   3823.35210|   4592.0703|
-| ExpVermost                 |  -1623.04932|  -1209.3974|
-| TreatmentOrder             |    -75.04587|    303.0219|
+| .rownames                          |      X0.5..|        X99.5..|
+|:-----------------------------------|-----------:|--------------:|
+| sd\_(Intercept)|PartID             |    568.3818|   1219.6829182|
+| cor\_ExpVermost.(Intercept)|PartID |     -1.0000|     -0.2338974|
+| sd\_ExpVermost|PartID              |    223.7889|    967.2028434|
+| sd\_(Intercept)|BlockOrder         |      0.0000|    289.2539580|
+| sigma                              |    681.8362|    874.4833442|
+| (Intercept)                        |   3944.7234|   4800.5154395|
+| ExpVermost                         |  -1744.8809|  -1109.9880952|
+| TreatmentOrder2                    |   -240.0648|    480.3760089|
 
-**Table 5**
+**Table 5** Comparing the effects of Easy and Hard crypticity treatments
 
-|              | ExpVer |  Estimate|  Standard Error|    DF|  t-value|  Lower CI|  Upper CI|  p-value|
-|--------------|:-------|---------:|---------------:|-----:|--------:|---------:|---------:|--------:|
-| ExpVer least | least  |  4418.892|        140.4895|  28.9|    31.45|  4131.511|  4706.273|        0|
-| ExpVer most  | most   |  3009.564|        140.3584|  28.8|    21.44|  2722.405|  3296.722|        0|
+|      | ExpVer |  Estimate|  Standard Error|    DF|  t-value|  Lower CI|  Upper CI| 
+|------|:-------|---------:|---------------:|-----:|--------:|---------:|---------:|
+| Hard | least  |  4422.447|        168.3409|  31.7|    26.27|  4079.430|  4765.463|
+| Easy | most   |  3009.091|        125.7184|  21.2|    23.94|  2747.816|  3270.365|
 
-**Table 6**
+While neither table explicity gives a p-value, they give 99.5% confidence interval ranges, from which we can infer significance. We can see that crypticity treatment was a significant effect in our model (Table 4), because it's confidence interval does not include zero, and we can also see that there was a significant difference between True-Positive search durations across the Easy and Hard treatments (Table 5) demonstrated by the fact that confidence intervals for the two treatments do not overlap. 
 
-|            |      Chi.sq|  Chi.DF|    p.value|
-|------------|-----------:|-------:|----------:|
-| BlockOrder |   0.8261084|       1|  0.3634002|
-| PartID     |  80.9390309|       1|  0.0000000|
+**Table 6** Comparing the effects of Block Order
 
-**Table 7** Marginal and conditional R<sup>2</sup> values for the linear model. 
+|         | TreatmentOrder |  Estimate|  Standard Error|    DF|  t-value|  Lower CI|  Upper CI|
+|---------|:---------------|---------:|---------------:|-----:|--------:|---------:|---------:|
+| Block 1 | 1              |  3641.909|        146.3069|  33.9|    24.89|  3344.530|  3939.287|
+| Block 2 | 2              |  3789.629|        146.4081|  33.9|    25.88|  3492.074|  4087.183|
 
+Treatment order is not a significant predictor of True-Positive search durations (Table 4), shown by a confidence interval that overlaps zero. Additionally,there was not significant difference in True-Positive search durations across the first and second treatment blocks (Table 5), demonstrated by the fact their confidence intervals overlap. 
+
+**Table 7** Check to see if Random Effects contribute to the model fit
+
+|               |     Chi.sq|  Chi.DF|    p.value|
+|---------------|----------:|-------:|----------:|
+| BlockOrder    |   1.219254|       1|  0.2695071|
+| ExpVer:PartID |  16.899378|       2|  0.0002140|
+
+From the confidence intervals (Table 4), we can see that all of the random effects are siginificant with the exception of sub-block order. In addition, tests of model fit (Table 7) shows that include a random effect for sub-block order did not significantly improve the model (compared to a model with no such random effect) but that by including an intercept for each subject, and slope for each subject, and including a term to see if subject intercept and slope covary, we have accounted for a significant amount of variation in the model and yielded a model with a significantly better fit (than if these subject random effects had not been included). 
+
+**Table 8** Get approximate measures of variance explained by estimate Marginal and Conditional R<sup>2</sup>
 | names |          x|
 |:------|----------:|
-| R2m   |  0.2952882|
-| R2c   |  0.5806626|
+| R2m   |  0.2959030|
+| R2c   |  0.6420232|
 
-**Figure 5** Checking the distribution of model residuals to make sure they approximate normality. 
-![](https://github.com/oguayasa/CrypticityAndVisualSearch-Pt2/blob/master/imgs/genResultsBarPlots.2.jpg)
+This conclusion about the importance of the random effects in our model is bolstered by checking the Marginal and Conditional R<sup>2</sup> values. These non-standard R<sup>2</sup>'s are useful for approximating the amount of variation in our data set explained by the model. Marginal R<sup>2</sup> estimates how much variance is accounted for by just the fixed effects in our model, while Conditional R<sup>2</sup> estimate the variance explained by a model with fixed *and* random effects. We can see that considerably more variance is explained with the inclusion of random effects (Table 8). 
 
+**Figure 5** Checking the distribution of model residuals to make sure they approximate normality (suggesting a correct model specification). Fortunately, it looks like we did an OK job.
 
+![](https://github.com/oguayasa/CrypticityAndVisualSearch-Pt2/blob/master/imgs/modelResid.TimePerTP.jpg)
 
-Describe the results from one of them.
+In brief, crypticity treatment was a significant predictor of the duration of True-Positive searches, with searches in the Hard condition taking significantly more time on average. In contrast, treatment order did not significantly affect True-Positive search durations. While including time within treatment (sub-block order) did not explain any additional variation in our model, accounting for the effects of individual subject across treatments certainly did.
 
 Determine the behavioral consistency of subjects within treatments
 ------------------------------------------------------------------
+So, let's see how consisitent subjects were within each treatment using the intraclass correlation coefficient (ICC). The ICC that will be applied here is the ICC 2, because I am considering sub-block order (judge) as a random effect. This ICC measures subject rank consistency across samples, while controlling for the effects of varying group means. It is not an absolute measure of agreement. Search duration for TP searches will once again be used as an example.
 
-The intraclass correlation coefficent (ICC) that will be applied here is the ICC 2, because I am considering sub-block order (judge) as a random effect. This ICC measures subject rank consistency across samples, while controlling for the effects of varying group means. It is not an absolute measure of agreement. Search duration for TP searches will once again be used as an example.
-
-**Table 8** ICC estimates for the duration of True-Positive searches completed during the Easy and Hard crypticity treatments. 
+**Table 9** ICC estimates for the duration of True-Positive searches completed during the Easy and Hard crypticity treatments. 
 |             | V1        | V2           |
 |-------------|:----------|:-------------|
 | Treatment   | Easy      | Hard         |
@@ -248,7 +290,7 @@ The intraclass correlation coefficent (ICC) that will be applied here is the ICC
 | lower.bound | 0.6416578 | 0.3089165    |
 | upper.bound | 0.7817393 | 0.5161467    |
 
-Looking at the values for the "ICC", "p", "lower.bound", and "upper.bound" rows for the Easy and Hard crypticity treatments (Table 2), we can see that subjects are significantly consistent in their behavior during both treatments. Interestingly however, it does appear that subjects were less consistent in during the Hard treatment than during the Easy treatment, suggesting that increasing target crypticity results in greater within-subject behavioral variance.
+Looking at the values for the "ICC", "p", "lower.bound", and "upper.bound" rows for the Easy and Hard crypticity treatments (Table 9), we can see that subjects are significantly consistent in their behavior during both treatments. Interestingly however, it does suggest that increasing target crypticity causes a reduction in subject behavioral consistency. 
 
 Boxplots to visualize treatments effects
 ----------------------------------------
@@ -258,15 +300,17 @@ To visualize treatment effects and subject variation, we will use boxplots overl
 **Figure 6** Number of TP searches and Average Search Duration.
 ![](https://github.com/oguayasa/CrypticityAndVisualSearch-Pt2/blob/master/imgs/genResultsBarPlots.2.jpg)
 
+There is a big effect of crypticity treatment on number and average duration of True-Positive searches. All subjects found fewer targets during the Hard crypticity treatment, and for almost every subject those searches took longer in the Hard treatment as well. 
 
 **Figure 7** Number of TN searches and Average Search Duration.
 ![](https://github.com/oguayasa/CrypticityAndVisualSearch-Pt2/blob/master/imgs/genResultsBarPlots.3.jpg)
 
+Crypticity treatment does not appear to affect the number of True-Negative searches, but it certainly affected how long it took to correctly dismiss a distractor stimuli, with True-Negative searches almost always lasting longer in the Hard crypticity treatment. 
 
 **Figure 8** Average Pupil Size and Total Search Distance
 ![](https://github.com/oguayasa/CrypticityAndVisualSearch-Pt2/blob/master/imgs/genResultsBarPlots.1.jpg)
 
-Discuss Results
+There is no apparent effects of crypticity treatment on average pupil size or scanpath length, suggesting that the Hard treatment did not cause greater cognitive load or increase movement expenditure during search. However, increasing target crypticity definitely affected subject's ability to find targets, increased the amount of time needed to find targets, and made it more difficult to dismiss distractors. 
 
 Correlation Analysis Across Treatments
 ======================================
@@ -327,7 +371,7 @@ for (i in 1:length(dat.4Corr)){
   print(kable(corr.4Print, results = 'asis', caption = tab.Cap, digits = 2))
 }
 ```
-**Tables 9-14** Results of correlation analysis using Spearman's *ρ* to determine the relationship between behaviors during Easy and Hard crypticity Treatments. 
+**Tables 10-15** Results of correlation analysis using Spearman's *ρ* to determine the relationship between behaviors during Easy and Hard crypticity Treatments. 
 
 |     | Var1            | Var2            | Corr-Value        | P-Value |
 |-----|:----------------|:----------------|:------------------|:--------|
@@ -353,7 +397,6 @@ for (i in 1:length(dat.4Corr)){
 |-----|:----------------|:----------------|:------------------|:--------------------|
 | rho | Easy\_TimePerTN | Hard\_TimePerTN | 0.449739212897108 | 0.00564131406661042 |
 
-Interestingly, all of the correlations are moderate to strong, positive, and significant with the exception of NumTP, the number of true-positive searches (Table 5). While all subjects did complete more TP searches in the Easy vs Hard crypticity treatment (Figure 6), subject ranking must have changed significantly across treatments. For example, the individuals who found the most targets during the Easy treatment, were not the same individuals who found the most targets during the Hard treatment.
 
 Scatterplots to view relationships
 ----------------------------------
@@ -372,6 +415,8 @@ Let's visualize these correlations using scatterplots overlaid with a line of be
 ![](https://github.com/oguayasa/CrypticityAndVisualSearch-Pt2/blob/master/imgs/genResultsCorrPlots.1.jpg)
 
 The lack of correlation for the number of true-positive searches (Figure 10), is quite apparent.
+
+Interestingly, all of the correlations are moderate to strong, positive, and significant with the exception of NumTP, the number of true-positive searches (Table 5). While all subjects did complete more TP searches in the Easy vs Hard crypticity treatment (Figure 6), subject ranking must have changed significantly across treatments. For example, the individuals who found the most targets during the Easy treatment, were not the same individuals who found the most targets during the Hard treatment.
 
 Summary
 =======
