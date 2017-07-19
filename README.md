@@ -260,6 +260,7 @@ Treatment order is not a significant predictor of True-Positive search durations
 From the confidence intervals (Table 4), we can see that all of the random effects are siginificant with the exception of sub-block order. In addition, tests of model fit (Table 7) shows that include a random effect for sub-block order did not significantly improve the model (compared to a model with no such random effect) but that by including an intercept for each subject, and slope for each subject, and including a term to see if subject intercept and slope covary, we have accounted for a significant amount of variation in the model and yielded a model with a significantly better fit (than if these subject random effects had not been included). 
 
 **Table 8** Get approximate measures of variance explained by estimate Marginal and Conditional R<sup>2</sup>
+
 | names |          x|
 |:------|----------:|
 | R2m   |  0.2959030|
@@ -278,6 +279,7 @@ Determine the behavioral consistency of subjects within treatments
 So, let's see how consisitent subjects were within each treatment using the intraclass correlation coefficient (ICC). The ICC that will be applied here is the ICC 2, because I am considering sub-block order (judge) as a random effect. This ICC measures subject rank consistency across samples, while controlling for the effects of varying group means. It is not an absolute measure of agreement. Search duration for TP searches will once again be used as an example.
 
 **Table 9** ICC estimates for the duration of True-Positive searches completed during the Easy and Hard crypticity treatments. 
+
 |             | V1        | V2           |
 |-------------|:----------|:-------------|
 | Treatment   | Easy      | Hard         |
@@ -401,7 +403,7 @@ for (i in 1:length(dat.4Corr)){
 Scatterplots to view relationships
 ----------------------------------
 
-Let's visualize these correlations using scatterplots overlaid with a line of best fit.
+Before we get into interpreting our results, let's first visualize these correlations using scatterplots overlaid with a line of best fit.
 
 **Figure 9** Number of TP searches and Average Search Duration.
 ![](https://github.com/oguayasa/CrypticityAndVisualSearch-Pt2/blob/master/imgs/genResultsCorrPlots.2.jpg)
@@ -414,9 +416,8 @@ Let's visualize these correlations using scatterplots overlaid with a line of be
 **Figure 11** Average Pupil Size and Total Search Distance
 ![](https://github.com/oguayasa/CrypticityAndVisualSearch-Pt2/blob/master/imgs/genResultsCorrPlots.1.jpg)
 
-The lack of correlation for the number of true-positive searches (Figure 10), is quite apparent.
 
-Interestingly, all of the correlations are moderate to strong, positive, and significant with the exception of NumTP, the number of true-positive searches (Table 5). While all subjects did complete more TP searches in the Easy vs Hard crypticity treatment (Figure 6), subject ranking must have changed significantly across treatments. For example, the individuals who found the most targets during the Easy treatment, were not the same individuals who found the most targets during the Hard treatment.
+Interestingly, all of the correlations are moderate to strong, positive, and significant with the exception of NumTP, the number of True-Positive searches (Table 5). While all subjects did complete more TP searches in the Easy vs Hard crypticity treatment (Figure 6), subject ranking must have changed significantly across treatments. The scatterplot showing the number of True-Positive searches (Figure 9) helps explain the low correlation value. For example, in Figure 9, it is easy to see that subjects who found the most targets during the Easy treatment, were not the same individuals who found the most targets during the Hard treatment, 
 
 Summary
 =======
