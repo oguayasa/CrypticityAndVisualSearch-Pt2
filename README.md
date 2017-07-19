@@ -92,6 +92,7 @@ kable(cont.Counts,  results = 'asis',
       caption = "Contingency Table of Search Outcome by Treatment", 
       digits = 2)
 ```
+**Table 1** Contingency Table of Search Outcome by Treatment
 
 |      |   NumTP|   NumFN|  NumFP|  NumTN|
 |------|-------:|-------:|------:|------:|
@@ -126,7 +127,7 @@ dev.off()
 ![](https://github.com/oguayasa/CrypticityAndVisualSearch-Pt2/blob/master/imgs/SearchCountBarPlot.jpg)
 
 
-Based on the contingency table, while crypticity treatment does not seem to affect the number of FP and TN searches, there definitely seems to be an effect on the number of TP and FN searches (which makes sense, since the number of TP and FN searches are related).
+Based on the contingency table, while crypticity treatment does not seem to affect the number of TN searches, there definitely seems to be an effect on the number of TP and FN searches (which makes sense, since the number of TP and FN searches are dependent), but also a small effect of the number of FP searches as well.
 
 Chi-Square Test of Independence
 -------------------------------
@@ -140,6 +141,7 @@ cont.Results <- chisq.test(cont.Counts)
 cont.Cap = "Chi-Square Test Results"
 kable(tidy(cont.Results), caption = cont.Cap)
 ```
+**Table 2** Chi-Square Test Results
 
 |  statistic|  p.value|  parameter| method                     |
 |----------:|--------:|----------:|:---------------------------|
@@ -171,12 +173,14 @@ This is so that we know how to properly specify our GLMMs in our code. Here, we 
 ![](https://github.com/oguayasa/CrypticityAndVisualSearch-Pt2/blob/master/imgs/genResultsDistCheck.1.jpg)
 
 
-Given the fact that NumTP and NumTN are count data (Figure 2), it is not surprising that they do not follow a normal distribution. To model these two measures, we will apply GLMMs with a Possion family(count data) and a log link function. Our other dependent variables (Figures 3 & 4)are continuous, but many of the distributions are not normal (which is pretty normal for psychological and biological behavioral studies). For these measures, our GLMMs will be specified with a Gaussian family (to deal with continuous data) with an identify link function. Since none of our distributions are "normal", we will but estimate our model parameters using Laplace approximation instead of any Maximum Likelihood approaches.
+Given the fact that NumTP and NumTN are count data (Figure 2), it is not surprising that they do not follow a normal distribution. To model these two measures, we will apply GLMMs with a Possion family (count data) and a log link function. Our other dependent variables (Figures 3 & 4) are continuous, but many of the distributions are not normal (which is pretty normal for psychological and biological behavioral studies). For these measures, our GLMMs will be specified with a Gaussian family (to deal with continuous data) with an identify link function. Since none of our distributions are "normal", we will estimate our model parameters using Laplace approximation instead of any Maximum Likelihood approaches.
 
 Run GLMMs and review output
 ---------------------------
 
 To save time and space, only the output from one GLMM will be shown. However, all of the boxplots showing treatment comparisons will be included, and the results from all of the GLMMs will be summarized there. This example will show the GLMM output and subsequent analysis for the average duration of True Positive searches.
+
+**Table 3** Estimates of Fixed and Random Effects. There is no std.error or statistic for the random effects because this particular function does not estimate them
 
 | term                       |     estimate|  std.error|   statistic| group      |
 |:---------------------------|------------:|----------:|-----------:|:-----------|
@@ -187,6 +191,8 @@ To save time and space, only the output from one GLMM will be shown. However, al
 | sd\_(Intercept).BlockOrder |     95.07958|         NA|          NA| BlockOrder |
 | sd\_Observation.Residual   |    838.15382|         NA|          NA| Residual   |
 
+**Table 4** Bootstrapped confidence intervals for the estimates of Fixed and Random Effects
+
 | .rownames                  |       X2.5..|     X97.5..|
 |:---------------------------|------------:|-----------:|
 | sd\_(Intercept)|PartID     |    470.22007|    867.0899|
@@ -196,22 +202,31 @@ To save time and space, only the output from one GLMM will be shown. However, al
 | ExpVermost                 |  -1623.04932|  -1209.3974|
 | TreatmentOrder             |    -75.04587|    303.0219|
 
+**Table 5**
+
 |              | ExpVer |  Estimate|  Standard Error|    DF|  t-value|  Lower CI|  Upper CI|  p-value|
 |--------------|:-------|---------:|---------------:|-----:|--------:|---------:|---------:|--------:|
 | ExpVer least | least  |  4418.892|        140.4895|  28.9|    31.45|  4131.511|  4706.273|        0|
 | ExpVer most  | most   |  3009.564|        140.3584|  28.8|    21.44|  2722.405|  3296.722|        0|
+
+**Table 6**
 
 |            |      Chi.sq|  Chi.DF|    p.value|
 |------------|-----------:|-------:|----------:|
 | BlockOrder |   0.8261084|       1|  0.3634002|
 | PartID     |  80.9390309|       1|  0.0000000|
 
+**Table 7** Marginal and conditional R<sup>2</sup> values for the linear model. 
+
 | names |          x|
 |:------|----------:|
 | R2m   |  0.2952882|
 | R2c   |  0.5806626|
 
-**Figure 5** Residuals.
+**Figure 5** Checking the distribution of model residuals to make sure they approximate normality. 
+![](https://github.com/oguayasa/CrypticityAndVisualSearch-Pt2/blob/master/imgs/genResultsBarPlots.2.jpg)
+
+
 
 Describe the results from one of them.
 
@@ -220,6 +235,7 @@ Determine the behavioral consistency of subjects within treatments
 
 The intraclass correlation coefficent (ICC) that will be applied here is the ICC 2, because I am considering sub-block order (judge) as a random effect. This ICC measures subject rank consistency across samples, while controlling for the effects of varying group means. It is not an absolute measure of agreement. Search duration for TP searches will once again be used as an example.
 
+**Table 8** ICC estimates for the duration of True-Positive searches completed during the Easy and Hard crypticity treatments. 
 |             | V1        | V2           |
 |-------------|:----------|:-------------|
 | Treatment   | Easy      | Hard         |
@@ -311,6 +327,7 @@ for (i in 1:length(dat.4Corr)){
   print(kable(corr.4Print, results = 'asis', caption = tab.Cap, digits = 2))
 }
 ```
+**Tables 9-14** Results of correlation analysis using Spearman's *ρ* to determine the relationship between behaviors during Easy and Hard crypticity Treatments. 
 
 |     | Var1            | Var2            | Corr-Value        | P-Value |
 |-----|:----------------|:----------------|:------------------|:--------|
