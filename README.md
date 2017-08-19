@@ -158,7 +158,7 @@ kable(tidy(cont.Results), caption = cont.Cap)
 
 The results of this test definitely support our intuition that crypticity treatment and the frequency of search outcomes are dependent. Based on the contingency table (Table 1) and barplot representation (Fig. 1), the dependence appears to come from the number of TP (and associated FN) and FP searches. When the crypticity treatment is Hard, there were fewer successful searches and more false-positive outcomes.
 
-While not included in the discussion above, prior examination of the data showed a large number of missing values for FP searches. This is because subjects made very few false positive identification. Therefore, latter analysis will include TP, TN, and FN searches, but not FP ones.
+While not included in the discussion above, prior examination of the data showed a large number of missing values for FP searches. This is because subjects made very few false positive identifications. For the sake of brevity, we will also omit FN searches from this tutorial. Therefore, analysis in this example will include data from TP and TN search, but not FP and FN ones.
 
 Using GLMMs to Determine Treatment Effects
 ==========================================
