@@ -6,7 +6,7 @@ Olivia Guayasamin
 
 Introduction
 --------
-This code demonstrate initial analyses to determine the effects of target crypticity (difficulty) on search performance and behaviors during a visual search task. We asked subjects to complete several rounds of a repeated visual search task where their goal was to find as many target stimuli, randomly placed withing a large "cloud" of similar looking distractors, as possible within a limited amount of time. The number of targets per trial was always 5, but subjects were told that it varied randomly. Each subject completed two blocks of trials, with one block containing only Easy versions of the task and the other containing only Hard versions. The Easy and Hard versions differed only in the [crypticity of targets](https://github.com/oguayasa/CrypticityAndVisualSearch-Pt1), not in their size, placement, or amount. The order in which these versions were presented was counterbalanced across subjects. Subject gaze positions were recorded throughout the study using Tobii eye-trackers.
+This code demonstrates initial analyses to determine the effects of target crypticity (difficulty) on search performance and behaviors during a visual search task. We asked subjects to complete several rounds of a repeated visual search task where their goal was to find as many target stimuli as possible (randomly dispersed inside a large "cloud" of similar looking distractors) within a limited amount of time. The number of targets per trial was always 5, but subjects were told that it varied randomly to prevent them from being discouraged by occasional poor performance and to prevent them from ceasing searching behaviors before the time was finished. Each subject completed two blocks of trials, with one block containing only Easy versions of the task and the other containing only Hard versions. The Easy and Hard versions differed only in the [crypticity of targets](https://github.com/oguayasa/CrypticityAndVisualSearch-Pt1), not in their size, placement, or amount. The order in which these versions were presented was counterbalanced across subjects. Subject gaze positions were recorded throughout the study using Tobii eye-trackers.
 
 To get a more complete understanding of how target crypticity affects search performance and behaviors, we decided to analyze the frequency and properties of all searches, not just the successful ones. To do this, we first classified each search based on its outcome: True Positives **TP** were searches where the target was successfully identified, True Negatives **TN** describe searches where a distractor was correctly left alone, False Positives **FP** were searches where a distractor was incorrectly identifed as a target, and False Negatives **FN** describe searches where a target went unidentified (FP and TN searches were extracted from a subset of 5 randomly selected distractors). After classifying searches into different "types" based on outcome, we determined the number and duration of every search type from each trial. In addition, we also extracted the total search distance (length of scan path) and average pupil size from each trial.
 
@@ -75,7 +75,7 @@ val.Data <- as.data.frame(val.GenData[, c(1, 2, 3, 4, 5, 6, 9, 10,
 Chi-Square Test of Independence on Search Outcomes
 ==================================================
 
-Determine if the frequency of different search types (TP, TN, FP, FN) is independent from target crypticity treatment (Easy & Hard).
+To conduct a simple *χ*<sup>2</sup> test of independence, we need first need to create a contingency table (a.k.a. a count table) that contains the number of times each type of search occured. 
 
 Format data into a contingency table
 ------------------------------------
@@ -110,6 +110,8 @@ kable(cont.Counts,  results = 'asis',
 Visualize data using a bar plot
 -------------------------------
 
+While images can make things easier to understand, they can also go a long way towards describing the magnitude of results in a more meaningful way than text. For example, the table above isn't all that hard to read, so the graph below isn't really providing an easy summary of the data so much as a lasting visualization. 
+
 ``` r
 # plot data in contingency table for visualization
 # format data for plotting 
@@ -134,7 +136,6 @@ dev.off()
 **Figure 1** A barplot showing the frequencies of different search types according to crypticity treatment (bar colors). Numbers are not whole because they represent the sums of the count averages taken from each sub-block of four trials.
 ![](https://github.com/oguayasa/CrypticityAndVisualSearch-Pt2/blob/master/imgs/SearchCountBarPlot.jpg)
 
-
 Based on the contingency table, while crypticity treatment does not seem to affect the number of TN searches, there definitely seems to be an effect on the number of TP and FN searches (which makes sense, since the number of TP and FN searches are dependent), but also a small effect of the number of FP searches as well.
 
 Chi-Square Test of Independence
@@ -157,17 +158,17 @@ kable(tidy(cont.Results), caption = cont.Cap)
 
 The results of this test definitely support our intuition that crypticity treatment and the frequency of search outcomes are dependent. Based on the contingency table (Table 1) and barplot representation (Fig. 1), the dependence appears to come from the number of TP (and associated FN) and FP searches. When the crypticity treatment is Hard, there were fewer successful searches and more false-positive outcomes.
 
-While not included in the discussion above, there are large amounts of missing data for FN and FP searches. This is because many subjects were able to find all 5 targets in a single trial (yielding no false-negative searches for that trial), and the fact that false-positives were incredibly rare events. Therefore, latter analysis will include TP and TN searches, but not FP and FN.
+While not included in the discussion above, prior examination of the data showed a large number of missing values for FP searches. This is because subjects made very few false positive identification. Therefore, latter analysis will include TP, TN, and FN searches, but not FP ones.
 
 Using GLMMs to Determine Treatment Effects
 ==========================================
 
-To determine the effect of crypticity treatment (Easy vs. Hard) on our search performance and behavior measures, we will essentially be conducting a Repeated Measures ANOVA analysis using Generalized Linear Mixed Models. There are several reasons why GLMMs can be a better alternative to Repeated Measures ANOVAs. We won't spend time discussing that here, but if you are interested in knowing more, the Analysis Factor blog gives a nice overview [here](http://www.theanalysisfactor.com/advantages-of-repeated-measures-anova-as-a-mixed-model/).
+To determine the effect of crypticity treatment (Easy vs. Hard) on our search performance and behavior measures, we will essentially be conducting a Repeated Measures ANOVA analysis using Generalized Linear Mixed Models. There are several reasons why GLMMs can be a better alternative to Repeated Measures ANOVAs. We won't spend time discussing that here, but if you are interested in knowing more, the Analysis Factor blog gives a nice overview [here](http://www.theanalysisfactor.com/advantages-of-repeated-measures-anova-as-a-mixed-model/). Long story short, you get more interpretive bang for your buck with a GLMM, whose results enable you to answer a wider variety of questions than can be done with the output of an ANOVA.
 
 Check data distributions prior to analysis
 ------------------------------------------
 
-This is so that we know how to properly specify our GLMMs in our code. Here, we will visualize data distributions using histograms and compare them to a normal distribution using qq-plots.
+This is so that we know how to properly specify our GLMMs in our code. Here, we will visualize data distributions using histograms and compare them to a normal distribution using qq-plots. 
 
 **Figure 2** Number of TP searches and Average Search Duration.
 ![](https://github.com/oguayasa/CrypticityAndVisualSearch-Pt2/blob/master/imgs/genResultsDistCheck.2.jpg)
@@ -181,14 +182,14 @@ This is so that we know how to properly specify our GLMMs in our code. Here, we 
 ![](https://github.com/oguayasa/CrypticityAndVisualSearch-Pt2/blob/master/imgs/genResultsDistCheck.1.jpg)
 
 
-Given the fact that NumTP and NumTN are count data (Figure 2), it is not surprising that they do not follow a normal distribution. To model these two measures, we will apply GLMMs with a Possion family (count data) and a log link function. Our other dependent variables (Figures 3 & 4) are continuous, but many of the distributions are not normal (which is pretty normal for psychological and biological behavioral studies). For these measures, our GLMMs will be specified with a Gaussian family (to deal with continuous data) with an identify link function. Since none of our distributions are "normal", we will estimate our model parameters using Laplace approximation instead of any Maximum Likelihood approaches.
+Given the fact that NumTP is are count data (Figure 2), it is not surprising that they do not follow a normal distribution. To model these two measures, we will apply GLMMs with a Possion family (count data) and a log link function. Our other dependent variables (Figures 3 & 4) are continuous, but many of the distributions are not normal (which is pretty normal for psychological and biological behavioral studies). For these measures, our GLMMs will be specified with a Gaussian family (to deal with continuous data) with an identify link function. Since none of our distributions are "normal", we will estimate our model parameters using Laplace approximation instead of any Maximum Likelihood approaches.
 
 Run GLMMs and review output
 ---------------------------
 
 To save time and space, only the output from one GLMM will be shown. However, all of the boxplots showing treatment comparisons will be included, so all general results will eventually be summarized. This example will show the GLMM output and subsequent analysis for the average duration of True-Positive searches.
 
-While most counterbalance designs would include an interaction term for the fixed effects (to see if there is an interaction between time and treatment), there is not one included here. Previously, we checked for a significant interaction and found none, so it has been removed from the final model shown below. In addition, while sub-block order has been been defined as a random intercept, subject is included as random intercept (expected to covary with) a random slope. This is because it is unlikely that all subjects showed the same pattern of change across Easy and Hard crypticity treatments, so we want the model to account for the likely variance in that change. 
+While most counterbalance designs would include an interaction term for the fixed effects (to see if there is an interaction between a treatment and the order in which it occured), there is not one included here. Previously, we checked for a significant interaction and found none, so it has been removed from the final model shown below. In addition, sub-block order and subject ID have been included as random effects to account for any variation due to time or individual.
 
 ``` r
 # reformat data for applying and plotting glmm
@@ -223,10 +224,8 @@ Here, we see the basic estimates of each effect's contribution to the model. Bec
 
 | .rownames                          |      X0.5..|        X99.5..|
 |:-----------------------------------|-----------:|--------------:|
-| sd\_(Intercept)|PartID             |    568.3818|   1219.6829182|
-| cor\_ExpVermost.(Intercept)|PartID |     -1.0000|     -0.2338974|
-| sd\_ExpVermost|PartID              |    223.7889|    967.2028434|
-| sd\_(Intercept)|BlockOrder         |      0.0000|    289.2539580|
+| sd\_(Intercept) PartID             |    568.3818|   1219.6829182|
+| sd\_(Intercept) BlockOrder         |      0.0000|    289.2539580|
 | sigma                              |    681.8362|    874.4833442|
 | (Intercept)                        |   3944.7234|   4800.5154395|
 | ExpVermost                         |  -1744.8809|  -1109.9880952|
@@ -255,9 +254,9 @@ Treatment order is not a significant predictor of True-Positive search durations
 |               |     Chi.sq|  Chi.DF|    p.value|
 |---------------|----------:|-------:|----------:|
 | BlockOrder    |   1.219254|       1|  0.2695071|
-| ExpVer:PartID |  16.899378|       2|  0.0002140|
+| PartID        |  16.899378|       2|  0.0002140|
 
-From the confidence intervals (Table 4), we can see that all of the random effects are siginificant with the exception of sub-block order. In addition, tests of model fit (Table 7) shows that include a random effect for sub-block order did not significantly improve the model (compared to a model with no such random effect) but that by including an intercept for each subject, and slope for each subject, and including a term to see if subject intercept and slope covary, we have accounted for a significant amount of variation in the model and yielded a model with a significantly better fit (than if these subject random effects had not been included). 
+From the confidence intervals (Table 4), we can see that all of the random effects are siginificant with the exception of sub-block order. In addition, tests of model fit (Table 7) shows that include a random effect for sub-block order did not significantly improve the model (compared to a model with no such random effect), but by including an intercept for each subject we have accounted for a significant amount of variation in the model and yielded a model with a significantly better fit (compared to a model where those random effects had not been included). 
 
 **Table 8** Get approximate measures of variance explained by estimate Marginal and Conditional R<sup>2</sup>
 
@@ -272,11 +271,11 @@ This conclusion about the importance of the random effects in our model is bolst
 
 ![](https://github.com/oguayasa/CrypticityAndVisualSearch-Pt2/blob/master/imgs/modelResid.TimePerTP.jpg)
 
-In brief, crypticity treatment was a significant predictor of the duration of True-Positive searches, with searches in the Hard condition taking significantly more time on average. In contrast, treatment order did not significantly affect True-Positive search durations. While including time within treatment (sub-block order) did not explain any additional variation in our model, accounting for the effects of individual subject across treatments certainly did.
+In brief, crypticity treatment was a significant predictor of the duration of True-Positive searches, with searches in the Hard condition taking significantly more time on average. In contrast, treatment order did not significantly affect True-Positive search durations. While including time within treatment (sub-block order) did not explain any additional variation in our model, accounting for the effects of individual subject certainly did. This indicates that for True-Positive search times, subjects varied amongst each other quite a bit, with some people completing TP searches much more quickly than others. 
 
 Determine the behavioral consistency of subjects within treatments
 ------------------------------------------------------------------
-So, let's see how consisitent subjects were within each treatment using the intraclass correlation coefficient (ICC). The ICC that will be applied here is the ICC 2, because I am considering sub-block order (judge) as a random effect. This ICC measures subject rank consistency across samples, while controlling for the effects of varying group means. It is not an absolute measure of agreement. Search duration for TP searches will once again be used as an example.
+Now, let's see how consisitent subjects were in TP search time, and if this consistency was affected by difficulty, using the intraclass correlation coefficient (ICC). The ICC that will be applied here is the ICC 2, because I am considering sub-block order (judge) as a random effect. This ICC measures subject rank consistency across samples, while controlling for the effects of varying group means. It is not an absolute measure of agreement. Search duration for TP searches will once again be used as an example.
 
 **Table 9** ICC estimates for the duration of True-Positive searches completed during the Easy and Hard crypticity treatments. 
 
@@ -297,7 +296,9 @@ Looking at the values for the "ICC", "p", "lower.bound", and "upper.bound" rows 
 Boxplots to visualize treatments effects
 ----------------------------------------
 
-To visualize treatment effects and subject variation, we will use boxplots overlaid on top of individual lines representing subject averages across treatments. Below each boxplot figure, we will include a histogram showing the distribution of within subject differences across treatments. These figures will include data from all measures, so that we can discuss results from the measures that were not used as examples for the GLMM and ICC analyses.
+To visualize average treatment effects both across and within subjects, we will use boxplots overlaid on top of individual lines representing subject averages across treatments. Below each boxplot figure, we will include a histogram showing the distribution of within subject differences across treatments. While including the histogram is not necessary (technically people could figure out treatment differences by looking at the boxplot), it does make this difference much easier to visualize. 
+
+These figures will include data from all measures so that we can discuss results outside of those in the examples given above.
 
 **Figure 6** Number of TP searches and Average Search Duration.
 ![](https://github.com/oguayasa/CrypticityAndVisualSearch-Pt2/blob/master/imgs/genResultsBarPlots.2.jpg)
@@ -317,7 +318,7 @@ There is no apparent effects of crypticity treatment on average pupil size or sc
 Correlation Analysis Across Treatments
 ======================================
 
-While the ICC analysis conduction above showed that subjects behave consistently within treatments, it also important to know whether subjects were consistent across treatments as well to see if the treatment affected all subjects equivalently. First, we will take subject averages for all measures collected during the Easy and Hard treatments.
+While the ICC analysis conducted above showed that subjects behave consistently within treatments, it also important to know whether subjects were consistent across treatments as well to see if the treatment affected all subjects equivalently. First, we will take subject averages for all measures collected during the Easy and Hard treatments so that the data is properly structured for correlation analysis.
 
 Averages of subject behavior
 ----------------------------
@@ -419,7 +420,9 @@ Before we get into interpreting our results, let's first visualize these correla
 
 Interestingly, all of the correlations are moderate to strong, positive, and significant with the exception of NumTP, the number of True-Positive searches (Table 5). While all subjects did complete more TP searches in the Easy vs Hard crypticity treatment (Figure 6), subject ranking must have changed significantly across treatments. The scatterplot showing the number of True-Positive searches (Figure 9) helps explain the low correlation value. For example, in Figure 9, it is easy to see that subjects who found the most targets during the Easy treatment, were not the same individuals who found the most targets during the Hard treatment, 
 
-Summary
-=======
+Conclusions
+===========
 
-TBC
+From this data set, we were able to learn that target crypiticty (search difficulty) affects the ratios of search success and errors, the number of True-Positive searches (targets successfully found), and subject efficiency at recognizing targets and dismissing distractor stimuli. While subjects varied quite a bit from each other, they usually held their relative ranks across difficulty treatments. For example, those who took longer to perform TP searches relative to their peers in the Easy Treatment also did so in the Hard Treatment. In addition, we learned that subject consistency was affected by difficulty, which subjects performing more variably during the difficult search trials. 
+
+We now have a good understanding of how search difficulty affects search performance and efficiency, but which search behaviors (gaze patterns and actions) are most affected by search difficulty?
